@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from json import dumps, loads
+from json import dumps
 from logging import getLogger
 
 from aiohttp import web
@@ -38,20 +38,19 @@ class View(object):
 
 class IndexView(View):
     async def get(self):
-        return web.json_response([])
+        return web.json_response(Task.all_objects())
 
     async def post(self):
         content = await self.request.json()
-        print(content)
         return web.json_response(
             Task.create_object(content),
             status=201,
-            dumps=dumps
+            dumps=dumps,
         )
 
     async def delete(self):
         Task.delete_all_objects()
-        return Response()
+        return web.json_response(Task.all_objects())
 
 
 class TodoView(View):
@@ -60,12 +59,17 @@ class TodoView(View):
         self.uuid = request.match_info.get('uuid')
 
     async def get(self):
-        return JSONResponse(Task.get_object(self.uuid))
+        return web.json_response(
+            Task.get_object(self.uuid),
+            dumps=dumps,
+        )
 
     async def patch(self):
         content = await self.request.json()
-        return JSONResponse(
-            Task.update_object(self.uuid, content))
+        return web.json_response(
+            Task.update_object(self.uuid, content),
+            dumps=dumps,
+        )
 
     async def delete(self):
         Task.delete_object(self.uuid)

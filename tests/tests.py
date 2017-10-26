@@ -2,40 +2,87 @@
 
 import json
 
-import requests
+import pytest
 
-from asyncio import get_event_loop
-from aiohttp.test_utils import TestClient, TestServer, loop_context
-
-from ..todobackend import get_app, init
+from todo_back.todobackend.models import Task
+from ..todobackend import get_app
 
 
-loop = get_event_loop()
+@pytest.fixture
+def client(loop, test_client):
+    return loop.run_until_complete(test_client(get_app))
 
 
-app = get_app(loop)
-# client = TestClient(TestServer(app), loop=loop)
-loop.run_until_complete(init(loop))  #client.start_server())
+@pytest.fixture
+def todo(client):
+    data = {
+        'user_id': 12,
+        'user': 'vf',
+        'todo': 'wash the car'
+    }
 
-#root = "http://127.0.0.1:8002"
-async def test_empty_initial_list_of_tasks():
-   resp = await requests.get("/")
-   assert resp.status == 200
-   assert await resp.text() == [] # 'we'
-   # print(text)
-   # text = json.loads(text)
-   # assert await text == 0
-# async def test_create_todo():
-#    data = {
-#        "user_id": 12,
-#        "user": "vf",
-#        "todo": "brush your teeth"
-#    }
-   
-#    resp = await client.post("/", data=json.dumps(data))
-#    assert resp.status == 201
-#    print(await resp.json())
-#    print(await resp.text())
-#  # loop.run_until_complete(test_empty_initial_list_of_tasks())
-# loop.run_until_complete(test_create_todo())
-# loop.run_until_complete(client.close())
+    return client.post('/', data=json.dumps(data))
+
+
+async def test_hello(client):
+    resp = await client.get('/')
+    assert resp.status == 200
+
+    assert [] == await resp.json()
+
+
+async def test_create_todo(client):
+    data = {
+        'user_id': 12,
+        'user': 'vf',
+        'todo': 'brush your teeth'
+    }
+
+    resp = await client.post('/', data=json.dumps(data))
+    assert resp.status == 201
+
+    res = await resp.json()
+    assert res['user'] == data['user']
+    assert res['user_id'] == data['user_id']
+    assert res['todo'] == data['todo']
+    assert res['completed'] is False
+
+
+async def test_get_todo_fixture(client, todo):
+    t = Task.all_objects()[0]
+    resp = await client.get('/{}'.format(t['uuid']))
+    assert resp.status == 200
+
+    res = await resp.json()
+    assert res['uuid'] == t['uuid']
+
+
+async def test_complete_todo(client, todo):
+    assert len(Task.all_objects()) == 1
+
+    t = Task.all_objects()[0]
+    assert t['completed'] is False
+
+    update = {
+        'completed': True
+    }
+
+    resp = await client.patch('/{}'.format(t['uuid']), data=json.dumps(update))
+    assert resp.status == 200
+
+    res = await resp.json()
+    assert res['completed'] is True
+
+
+
+    # t = await todo
+    # print(t)
+    #
+    # assert t['todo'] == 'wash the car'
+    #
+    # resp = await client.get('/')
+    # assert resp.status == 200
+    #
+    # res = await resp.json()
+    # # print(res)
+    # assert len(res) == 1
