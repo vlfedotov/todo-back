@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 async def cors_middleware_factory(app, handler):
     async def middleware(request):
         resp = await handler(request)

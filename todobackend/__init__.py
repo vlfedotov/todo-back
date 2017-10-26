@@ -8,20 +8,28 @@ from .views import (
     TodoView,
 )
 
-IP = getenv('IP', '0.0.0.0')
-PORT = getenv('PORT', '8000')
 
 basicConfig(level=INFO)
 logger = getLogger(__name__)
 
 
-async def init(loop):
+IP = getenv('IP', '0.0.0.0')
+PORT = getenv('PORT', '8000')
+
+
+def get_app(loop):
     app = web.Application(loop=loop, middlewares=[cors_middleware_factory])
 
     # Routes
     app.router.add_route('*', '/', IndexView.dispatch)
     app.router.add_route('*', '/{uuid}', TodoView.dispatch)
 
+    return app
+
+
+async def init(loop):
+    app = get_app(loop)
+    
     # Config
     logger.info("Starting server at %s:%s", IP, PORT)
     srv = await loop.create_server(app.make_handler(), IP, PORT)

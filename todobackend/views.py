@@ -1,6 +1,9 @@
-from json import dumps
+# -*- coding: utf-8 -*-
+
+from json import dumps, loads
 from logging import getLogger
 
+from aiohttp import web
 from aiohttp.web import Response
 from aiohttp.web_exceptions import HTTPMethodNotAllowed
 
@@ -10,11 +13,11 @@ logger = getLogger(__name__)
 
 
 class JSONResponse(Response):
-    def __init__(self, content):
-        super().__init__(text=dumps(content))
+    def __init__(self, content, status=200):
+        super().__init__(text=dumps(content), status=status)
 
 
-class View:
+class View(object):
     def __init__(self, request):
         self.request = request
 
@@ -35,12 +38,15 @@ class View:
 
 class IndexView(View):
     async def get(self):
-        return JSONResponse(Task.all_objects())
+        return web.json_response([])
 
     async def post(self):
         content = await self.request.json()
-        return JSONResponse(
-            Task.create_object(content)
+        print(content)
+        return web.json_response(
+            Task.create_object(content),
+            status=201,
+            dumps=dumps
         )
 
     async def delete(self):

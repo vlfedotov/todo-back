@@ -1,0 +1,25 @@
+# -*- coding: utf-8 -*-
+
+import pytest
+
+
+def test_a():
+    assert 1 == 1
+
+
+from aiohttp import web
+from todo-back.todobackend import init
+
+print(init)
+async def hello(request):
+    return web.Response(text='Hello, world')
+
+
+async def aatest_hello(test_client, loop):
+    app = web.Application()
+    app.router.add_get('/', hello)
+    client = await test_client(app)
+    resp = await client.get('/')
+    assert resp.status == 200
+    text = await resp.text()
+    assert 'Hello, world' in text
