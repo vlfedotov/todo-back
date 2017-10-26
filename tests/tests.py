@@ -49,12 +49,12 @@ async def test_create_todo(client):
 
 
 async def test_get_todo_fixture(client, todo):
-    t = Task.all_objects()[0]
-    resp = await client.get('/{}'.format(t['uuid']))
+    task = Task.all_objects()[0]
+    resp = await client.get('/{}'.format(task['uuid']))
     assert resp.status == 200
 
     res = await resp.json()
-    assert res['uuid'] == t['uuid']
+    assert res['uuid'] == task['uuid']
 
 
 async def test_complete_todo(client, todo):
@@ -74,15 +74,5 @@ async def test_complete_todo(client, todo):
     assert res['completed'] is True
 
 
-
-    # t = await todo
-    # print(t)
-    #
-    # assert t['todo'] == 'wash the car'
-    #
-    # resp = await client.get('/')
-    # assert resp.status == 200
-    #
-    # res = await resp.json()
-    # # print(res)
-    # assert len(res) == 1
+async def testdelete_todo(client, todo):
+    pass
