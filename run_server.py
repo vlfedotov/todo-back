@@ -1,6 +1,6 @@
 from asyncio import get_event_loop
 
-from todobackend import init
+from todo_todo import init
 
 loop = get_event_loop()
 loop.run_until_complete(init(loop))

@@ -4,8 +4,8 @@ import json
 
 import pytest
 
-from todo_back.todobackend.models import Task
-from ..todobackend import get_app
+from todo_todo.todo_todo.models import Task
+from ..todo_todo import get_app
 
 
 @pytest.fixture
