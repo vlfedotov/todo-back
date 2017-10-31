@@ -9,12 +9,9 @@ class Task:
     @classmethod
     def create_object(cls, content):
         uuid = str(uuid4())
-        HOST = getenv('HOST', 'localhost:8000')
         obj = {
             'uuid': uuid,
             'completed': False,
-            'url': 'http://{HOST}/{uuid}'.format(
-                **locals())
         }
         obj.update(content)
         cls.set_object(uuid, obj)

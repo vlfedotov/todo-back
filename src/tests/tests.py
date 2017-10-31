@@ -4,7 +4,7 @@ import json
 
 import pytest
 
-from todo_todo.todo_todo.models import Task
+from ..todo_todo.models import Task
 from ..todo_todo import get_app
 
 
