@@ -4,4 +4,4 @@ services:
   todo_todo:
     build:
       context: ../../
-      dockerfile: docker/ci_unit/Dockerfile
+      dockerfile: docker/ci/Dockerfile
